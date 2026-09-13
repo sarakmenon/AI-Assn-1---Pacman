@@ -301,9 +301,14 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         # mark starting position as visited if it is a corner
-        visited_corners = tuple(
-            self.startingPosition == corner for corner in self.corners
-        )
+        visited_corners_list = []
+        for corner in self.corners:
+            if self.startingPosition == corner:
+                visited_corners_list.append(True)
+            else:
+                visited_corners_list.append(False)
+
+        visited_corners = tuple(visited_corners_list)
 
         # start state contains position and visited corners
         return (self.startingPosition, visited_corners)
@@ -317,7 +322,12 @@ class CornersProblem(search.SearchProblem):
         position, visited_corners = state
 
         # checks if all four corners have been visited
-        return all(visited_corners)
+        for visited in visited_corners:
+            if visited == False:
+                return False
+
+        # if none were False, all four corners were visited
+        return True
 
 
     def getSuccessors(self, state: Any):
@@ -406,20 +416,20 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     currentPosition, visited_corners = state
 
     # collect corners that still need to be visited
-    remaining_corners = []
+    unvisited_corners = []
     for index, corner in enumerate(corners):
         if not visited_corners[index]:
-            remaining_corners.append(corner)
+            unvisited_corners.append(corner)
 
     # no corners left, so no more moves needed
-    if not remaining_corners:
+    if not unvisited_corners:
         return 0
     
     # track the shortest route when walls are ignored
     best_cost = float('inf')
 
     # try every order of the remaining corners
-    for order in permutations(remaining_corners):
+    for order in permutations(unvisited_corners):
         total_cost = 0
         position = currentPosition
 

@@ -87,7 +87,7 @@ def depthFirstSearch(problem: SearchProblem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    # unexplored nodes to visit
+    # unexplored nodes to visit - stack for DFS
     frontier = util.Stack()
     # visited nodes to avoid loops
     visited = set()
@@ -110,7 +110,7 @@ def depthFirstSearch(problem: SearchProblem):
         if problem.isGoalState(state):
             return path
         
-        # add allowed next states and paths to the stack
+        # add allowed next states and paths - tells us all the legal places PacMan can move to next
         for successor, action, step_cost in problem.getSuccessors(state):
             if successor not in visited:
                 # new path to the successor
@@ -124,7 +124,7 @@ def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
-    # unexplored nodes to visit
+    # unexplored nodes to visit - queue for BFS
     frontier = util.Queue()
     # visited nodes to avoid loops
     visited = set()
@@ -147,7 +147,7 @@ def breadthFirstSearch(problem: SearchProblem):
         if problem.isGoalState(state):
             return path
 
-        # add allowed next states and paths to the queue
+        # add allowed next states and paths to the queue - tells us all the legal places PacMan can move to next
         for successor, action, step_cost in problem.getSuccessors(state):
             if successor not in visited:
                 # new path to the successor
@@ -162,14 +162,15 @@ def breadthFirstSearch(problem: SearchProblem):
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    # unexplored nodes to visit, lowest total cost first
+    # unexplored nodes to visit, lowest total cost first - priority queue
     frontier = util.PriorityQueue()
     # visited nodes to avoid loops
     visited = set()
 
     # start state with empty path and zero cost, push to frontier
     start_state = problem.getStartState()
-    frontier.push((start_state, [], 0), 0) # (state,path, cost), priority
+    # priority queue takes in (state, path, cost) and the priority value - from util.py: def push(self, item, priority):
+    frontier.push((start_state, [], 0), 0) 
 
     while not frontier.isEmpty():
         # node contains state, path to the state, and total cost
@@ -185,14 +186,14 @@ def uniformCostSearch(problem: SearchProblem):
         if problem.isGoalState(state):
             return path
 
-        # add allowed next states and paths to the priority queue
+        # add allowed next states and paths to the priority queue - tells us all the legal places PacMan can move to next
         for successor, action, step_cost in problem.getSuccessors(state):
             if successor not in visited:
                 # new path to the successor
                 new_path = path + [action]
-                # add next step cost to the cost so far
+                # new cost - add next step cost to the cost so far
                 new_cost = cost + step_cost
-                # use total path cost as the priority
+                # use new cost as the priority
                 frontier.push((successor, new_path, new_cost), new_cost)
     # if no route to goal
     return []
@@ -214,7 +215,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
 
     # start state with empty path and zero cost, push to frontier
     start_state = problem.getStartState()
-    frontier.push((start_state, [], 0), 0 + heuristic(start_state, problem)) # (state,path, cost), priority
+    frontier.push((start_state, [], 0), 0 + heuristic(start_state, problem)) # (state,path, cost), priority with priority = cost + heuristic
 
     while not frontier.isEmpty():
         # node contains state, path to the state, and total cost
@@ -235,9 +236,9 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             if successor not in visited:
                 # new path to the successor
                 new_path = path + [action]
-                # add next step cost to the cost so far
+                # new cost - add next step cost to the cost so far
                 new_cost = cost + step_cost
-                # use total path cost plus estimated remaining cost as priority
+                # use new cost plus estimated remaining cost as priority - f(n) = g(n) + h(n)
                 priority = new_cost + heuristic(successor, problem)
                 frontier.push((successor, new_path, new_cost), priority)
     # if no route to goal
